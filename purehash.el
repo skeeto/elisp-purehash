@@ -114,6 +114,19 @@ for :weakness. Also, :test can be any comparison function."
              do (setf (purehash-get key table) value)
              finally (return table))))
 
+(defun purehash-to-hash-table (purehash)
+  "Return a native hash table with the same contents as PUREHASH."
+  (let ((hash-table (make-hash-table :test (purehash-test purehash))))
+    (prog1 hash-table
+      (purehash-map (lambda (k v) (setf (gethash k hash-table) v)) purehash))))
+
+(defun purehash-from-hash-table (hash-table)
+  "Return a native hash table with the same contents as PUREHASH."
+  (let ((purehash (purehash-create :test (hash-table-test hash-table))))
+    (prog1 purehash
+      (cl-loop for key hash-keys of hash-table using (hash-value value)
+               do (setf (purehash-get key purehash) value)))))
+
 (provide 'purehash)
 
 ;;; purehash.el ends here
